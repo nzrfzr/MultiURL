@@ -18,101 +18,29 @@ if (typeof chrome !== 'undefined' && chrome.alarms?.onAlarm) {
   });
 }
 
-let monitorWindowId: number | null = null;
-
-async function openMonitorWindow(): Promise<void> {
-  if (typeof chrome === 'undefined' || !chrome.windows?.create) return;
-
-  if (monitorWindowId !== null) {
-    try {
-      const win = await chrome.windows.get(monitorWindowId);
-      if (win && win.id) {
-        chrome.windows.update(win.id, { focused: false });
-        return;
-      }
-    } catch {
-      monitorWindowId = null;
-    }
-  }
-
-  const url = chrome.runtime.getURL('popup.html?view=monitor');
-  try {
-    const win = await chrome.windows.create({
-      url,
-      type: 'popup',
-      width: 440,
-      height: 300,
-      focused: false,
-    });
-    if (win && win.id !== undefined) {
-      monitorWindowId = win.id;
-    }
-  } catch (err) {
-    console.warn('[MultiURL] Could not create monitor window:', err);
-  }
-}
-
-// Track when monitor window is closed
-if (typeof chrome !== 'undefined' && chrome.windows?.onRemoved) {
-  chrome.windows.onRemoved.addListener((winId) => {
-    if (winId === monitorWindowId) {
-      monitorWindowId = null;
+// ─── Keepalive Port Listener ──────────────────────────────────────────────────
+if (typeof chrome !== 'undefined' && chrome.runtime?.onConnect) {
+  chrome.runtime.onConnect.addListener((port) => {
+    if (port.name === 'multiurl_keepalive') {
+      port.onDisconnect.addListener(() => {});
     }
   });
 }
-
-// ─── Helper: broadcast state to all open tabs ─────────────────────────────────
-
-function broadcastToAllTabs(state: ReturnType<typeof controller.getState>): void {
-  if (typeof chrome === 'undefined' || !chrome.tabs?.query) return;
-  chrome.tabs.query({}, (tabs) => {
-    if (!tabs || tabs.length === 0) return;
-    for (const tab of tabs) {
-      if (tab.id && tab.id > 0) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          { type: 'MULTIURL_STATE_UPDATE', state },
-          () => { void chrome.runtime.lastError; } // ignore "no receiver" errors
-        );
-      }
-    }
-  });
-}
-
-// ─── When the user switches tabs, forward current state to the new active tab ─
-
-if (typeof chrome !== 'undefined' && chrome.tabs?.onActivated) {
-  chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    await controller.whenReady();
-    const state = controller.getState();
-    if (activeInfo.tabId && activeInfo.tabId > 0) {
-      chrome.tabs.sendMessage(
-        activeInfo.tabId,
-        { type: 'MULTIURL_STATE_UPDATE', state },
-        () => { void chrome.runtime.lastError; }
-      );
-    }
-  });
-}
-
-// ─── Broadcast state updates ──────────────────────────────────────────────────
+// ─── Broadcast state updates to popup ────────────────────────────────────────
 
 controller.subscribe((state) => {
-  // 1. Notify the popup and monitor window (if open)
   if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
     try {
       const p = chrome.runtime.sendMessage({ type: 'STATE_UPDATED', state });
       if (p && typeof (p as any).catch === 'function') {
-        (p as any).catch(() => { /* safe to ignore */ });
+        (p as any).catch(() => { /* safe to ignore — popup may be closed */ });
       }
     } catch {
       // Safe to ignore
     }
   }
-
-  // 2. Broadcast to all open tabs so in-page widgets remain updated
-  broadcastToAllTabs(state);
 });
+
 
 // ─── Message handler ──────────────────────────────────────────────────────────
 
@@ -131,10 +59,6 @@ async function handleMessage(
         message.entries,
         message.delaySeconds,
         message.limit
-      );
-      // Automatically open the floating monitor window across the browser!
-      openMonitorWindow().catch((err) =>
-        console.warn('[MultiURL] openMonitorWindow error:', err)
       );
       return { success: true, data: controller.getState() };
 

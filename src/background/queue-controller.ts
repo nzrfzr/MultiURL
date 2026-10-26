@@ -140,9 +140,11 @@ export class QueueController {
   private setupListeners() {
     // Tab removal listener for Queue Mode
     this.tabRemovedUnsub = onTabRemoved((tabId) => {
-      this.handleTabRemoved(tabId).catch((err) =>
-        console.warn('[MultiURL] handleTabRemoved error:', err)
-      );
+      try {
+        this.handleTabRemoved(tabId);
+      } catch (err) {
+        console.warn('[MultiURL] handleTabRemoved error:', err);
+      }
     });
 
     // Tab replacement listener (e.g. process swap / prerender in Chrome)
@@ -338,14 +340,30 @@ export class QueueController {
     this.isProcessing = false;
     this.pendingRefill = false;
 
-    // Adopt the persisted state.
-    this.state = { ...saved };
+    // Reconcile saved tabs against live tabs in browser so closed tabs aren't restored as zombies
+    const checkResults = await Promise.all(
+      (saved.managedTabIds ?? []).map(async (id) => ({ id, alive: await isTabAlive(id) }))
+    );
+    const liveManagedTabs = checkResults.filter((r) => r.alive).map((r) => r.id);
+    const cleanedMap: Record<number, string> = {};
+    for (const id of liveManagedTabs) {
+      if (saved.tabToEntryIdMap?.[id]) {
+        cleanedMap[id] = saved.tabToEntryIdMap[id];
+      }
+    }
+
+    // Adopt the persisted state with only confirmed live tabs
+    this.state = {
+      ...saved,
+      managedTabIds: liveManagedTabs,
+      tabToEntryIdMap: cleanedMap,
+    };
 
     if (this.state.status === 'running') {
       if (this.state.mode === 'queue') {
         this.startWatchdog();
       }
-      this.state.statusMessage = 'Resuming after browser restart...';
+      this.state.statusMessage = 'Resuming session...';
       this.notify();
       await this.processNextBatch();
     } else {
@@ -453,8 +471,11 @@ export class QueueController {
     }
   }
 
-  private async handleTabRemoved(tabId: number) {
-    await this.whenReady();
+  private handleTabRemoved(tabId: number) {
+    if (!this.isReady) {
+      this.whenReady().then(() => this.handleTabRemoved(tabId));
+      return;
+    }
 
     const idx = this.state.managedTabIds.indexOf(tabId);
     if (idx === -1) {
@@ -476,7 +497,15 @@ export class QueueController {
     }
 
     if (this.state.status === 'running' && this.state.mode === 'queue') {
-      await this.processNextBatch();
+      if (this.isProcessing) {
+        // Signal that a refill is needed; the active processNextBatch do-while will pick it up.
+        this.pendingRefill = true;
+        this.notify();
+      } else {
+        this.processNextBatch().catch((err) =>
+          console.warn('[MultiURL] processNextBatch error in handleTabRemoved:', err)
+        );
+      }
     } else {
       this.notify();
     }
@@ -512,7 +541,6 @@ export class QueueController {
 
   private async dispatchUrl(entry: UrlEntry): Promise<number | null> {
     this.state.entryOutcomes[entry.id] = 'opening';
-    this.notify();
 
     try {
       const tabId = await createTab(entry.normalizedUrl);

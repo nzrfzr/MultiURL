@@ -14,7 +14,7 @@ export function hasExtensionApi(): boolean {
  * Does not activate the tab by default so the user is not disrupted.
  */
 export async function createTab(url: string, active = false): Promise<number> {
-  if (!hasExtensionApi() || !chrome.tabs) {
+  if (!hasExtensionApi() || !chrome.tabs?.create) {
     // Mock / fallback for local development or preview
     console.log('[Dev Mock] Created tab for URL:', url);
     return Math.floor(Math.random() * 100000) + 1;

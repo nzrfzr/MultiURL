@@ -8,7 +8,7 @@
  *   - Queue mode active slots
  *   - Success, Failed, Remaining stats chips
  *   - Real-time status text
- *   - Action controls (Pause/Resume, Stop) with clean spacing
+ *   - Dedicated action buttons (Pause/Resume, Stop) with generous padding and clean spacing
  *   - Minimize to a sleek compact corner pill
  */
 
@@ -34,6 +34,21 @@ const STATUS_CFG = {
 // ─── State ────────────────────────────────────────────────────────────────────
 
 let minimized = false;
+let keepAlivePort: chrome.runtime.Port | null = null;
+
+function maintainKeepAlive(): void {
+  if (typeof chrome === 'undefined' || !chrome.runtime?.connect) return;
+  try {
+    if (!keepAlivePort) {
+      keepAlivePort = chrome.runtime.connect({ name: 'multiurl_keepalive' });
+      keepAlivePort.onDisconnect.addListener(() => {
+        keepAlivePort = null;
+      });
+    }
+  } catch {
+    // safe to ignore
+  }
+}
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -62,12 +77,12 @@ function injectStyles(): void {
       width: 360px;
       background: #FFFFFF;
       border: 1px solid #E2E8F0;
-      border-radius: 12px;
+      border-radius: 14px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
-      padding: 13px 15px;
+      padding: 14px 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 11px;
       transition: box-shadow 0.2s, transform 0.2s;
       animation: mul-in 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
@@ -81,12 +96,12 @@ function injectStyles(): void {
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid #F1F5F9;
-      padding-bottom: 8px;
+      padding-bottom: 9px;
     }
     .mul-header-left {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
     }
 
     /* ── Dot Indicator ── */
@@ -106,7 +121,7 @@ function injectStyles(): void {
 
     /* ── App name ── */
     #mul-name {
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 700;
       color: #0F172A;
       letter-spacing: -0.01em;
@@ -120,78 +135,31 @@ function injectStyles(): void {
       border-radius: 9999px;
       border-width: 1px;
       border-style: solid;
-      padding: 1px 7px;
+      padding: 2px 8px;
       font-size: 10px;
       font-weight: 600;
       flex-shrink: 0;
     }
 
-    /* ── Header Actions ── */
-    .mul-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* ── Buttons ── */
-    .mul-btn {
-      all: unset;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 24px;
-      padding: 0 9px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid #CBD5E1;
-      background: #F8FAFC;
-      color: #334155;
-      transition: background 0.12s, color 0.12s, border-color 0.12s;
-      flex-shrink: 0;
-    }
-    .mul-btn:hover {
-      background: #F1F5F9;
-      color: #0F172A;
-    }
-    .mul-btn.resume {
-      background: #FFFBEB;
-      color: #D97706;
-      border-color: #FDE68A;
-    }
-    .mul-btn.resume:hover {
-      background: #FEF3C7;
-    }
-    .mul-btn.stop {
-      background: #FEF2F2;
-      color: #DC2626;
-      border-color: #FECACA;
-    }
-    .mul-btn.stop:hover {
-      background: #FEE2E2;
-    }
-
     /* ── Minimize Toggle Button ── */
     #mul-toggle {
       all: unset;
+      box-sizing: border-box;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
       color: #94A3B8;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1;
-      margin-left: 2px;
-      flex-shrink: 0;
       transition: background 0.12s, color 0.12s;
     }
     #mul-toggle:hover {
       background: #F1F5F9;
-      color: #475569;
+      color: #334155;
     }
 
     /* ── Progress Section ── */
@@ -204,7 +172,7 @@ function injectStyles(): void {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11px;
+      font-size: 11.5px;
     }
     .mul-progress-label {
       font-weight: 600;
@@ -245,14 +213,14 @@ function injectStyles(): void {
     /* ── Stats Breakdown Row ── */
     .mul-stats-row {
       display: flex;
-      gap: 7px;
+      gap: 8px;
     }
     .mul-stat-chip {
       flex: 1;
       background: #F8FAFC;
       border: 1px solid #E2E8F0;
-      border-radius: 6px;
-      padding: 5px 6px;
+      border-radius: 7px;
+      padding: 6px 8px;
       text-align: center;
     }
     .mul-stat-title {
@@ -263,10 +231,10 @@ function injectStyles(): void {
       line-height: 1;
     }
     .mul-stat-val {
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #0F172A;
-      margin-top: 2px;
+      margin-top: 3px;
       line-height: 1.2;
       font-variant-numeric: tabular-nums;
     }
@@ -281,14 +249,75 @@ function injectStyles(): void {
 
     /* ── Status Message Row ── */
     #mul-status-msg {
-      font-size: 10.5px;
+      font-size: 11px;
       color: #64748B;
       font-style: italic;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      padding-top: 2px;
+      padding-top: 3px;
       border-top: 1px solid #F8FAFC;
+      line-height: 1.3;
+    }
+
+    /* ── Dedicated Action Controls Row: Spacious, Clean, Roomy ── */
+    .mul-actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 2px;
+      width: 100%;
+    }
+
+    .mul-btn {
+      all: unset;
+      box-sizing: border-box;
+      flex: 1;
+      height: 32px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #334155;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+      line-height: 1;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    .mul-btn:hover {
+      background: #F8FAFC;
+      color: #0F172A;
+      border-color: #94A3B8;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+    .mul-btn:active {
+      transform: scale(0.98);
+    }
+    .mul-btn.resume {
+      background: #FFFBEB;
+      color: #D97706;
+      border-color: #FDE68A;
+    }
+    .mul-btn.resume:hover {
+      background: #FEF3C7;
+      border-color: #F59E0B;
+      color: #B45309;
+    }
+    .mul-btn.stop {
+      background: #FEF2F2;
+      color: #DC2626;
+      border-color: #FECACA;
+    }
+    .mul-btn.stop:hover {
+      background: #FEE2E2;
+      color: #B91C1C;
+      border-color: #F87171;
     }
 
     /* ── Minimized State: Sleek Corner Pill ── */
@@ -310,10 +339,11 @@ function injectStyles(): void {
       justify-content: flex-start;
       gap: 8px;
     }
-    #mul-card.minimized .mul-header-actions,
+    #mul-card.minimized #mul-toggle,
     #mul-card.minimized .mul-progress-section,
     #mul-card.minimized .mul-stats-row,
-    #mul-card.minimized #mul-status-msg {
+    #mul-card.minimized #mul-status-msg,
+    #mul-card.minimized .mul-actions-row {
       display: none !important;
     }
     #mul-min-info {
@@ -365,11 +395,7 @@ function getOrCreate(): HTMLElement {
             <span class="mul-expand-icon" title="Click to expand">↗</span>
           </div>
         </div>
-        <div class="mul-header-actions">
-          <button id="mul-btn-pr" class="mul-btn">Pause</button>
-          <button id="mul-btn-stop" class="mul-btn stop">Stop</button>
-          <button id="mul-toggle" title="Minimize">&minus;</button>
-        </div>
+        <button id="mul-toggle" title="Minimize">&minus;</button>
       </div>
 
       <!-- 2. Progress Section -->
@@ -407,6 +433,12 @@ function getOrCreate(): HTMLElement {
 
       <!-- 4. Status Message -->
       <div id="mul-status-msg">Opening URLs...</div>
+
+      <!-- 5. Dedicated Action Controls Row: Spacious & Clear -->
+      <div class="mul-actions-row">
+        <button id="mul-btn-pr" class="mul-btn">Pause</button>
+        <button id="mul-btn-stop" class="mul-btn stop">Stop</button>
+      </div>
     </div>
   `;
   document.documentElement.appendChild(host);
@@ -495,6 +527,7 @@ function updateWidget(state: QueueSessionState): void {
     return;
   }
 
+  maintainKeepAlive();
   getOrCreate();
 
   const cfg = STATUS_CFG[state.status as 'running' | 'paused'];

@@ -22,11 +22,12 @@ const actionBtnBase: React.CSSProperties = {
   boxSizing: 'border-box',
   cursor: 'pointer',
   transition: 'all 0.15s ease-out',
+  lineHeight: 1,
 };
 
 const secondaryBtn: React.CSSProperties = {
   ...actionBtnBase,
-  padding: '0 16px',
+  padding: '8px 20px',
   border: '1px solid #CBD5E1',
   backgroundColor: '#FFFFFF',
   color: '#334155',
@@ -109,7 +110,7 @@ export const ActionControls: React.FC<ActionControlsProps> = ({
         style={{
           ...actionBtnBase,
           flex: 1,
-          padding: '0 16px',
+          padding: '8px 20px',
           border: 'none',
           backgroundColor: '#2563EB',
           color: '#FFFFFF',

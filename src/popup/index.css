@@ -21,17 +21,7 @@ html, body {
   overflow: hidden;
 }
 
-/* Standalone floating monitor mode */
-html.monitor-mode,
-body.monitor-mode,
-#root.monitor-mode {
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-}
+
 
 /* Custom Slim Scrollbar for URL list and Textarea */
 ::-webkit-scrollbar {

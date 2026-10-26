@@ -26,7 +26,6 @@ import { OpenModeSelector } from './components/OpenModeSelector';
 import { ProgressPanel } from './components/ProgressPanel';
 import { ActionControls } from './components/ActionControls';
 import { Footer } from './components/Footer';
-import { MonitorView } from './components/MonitorView';
 
 const INPUT_STORAGE_KEY = 'multiurls_saved_input_text';
 const SETTINGS_STORAGE_KEY = 'multiurls_saved_settings';
@@ -237,30 +236,6 @@ export const App: React.FC = () => {
       if (res.success && res.data) setSession(res.data);
     });
   };
-
-  const isMonitorMode =
-    typeof window !== 'undefined' &&
-    window.location.search.includes('view=monitor');
-
-  useEffect(() => {
-    if (isMonitorMode) {
-      document.documentElement.classList.add('monitor-mode');
-      document.body.classList.add('monitor-mode');
-      const root = document.getElementById('root');
-      if (root) root.classList.add('monitor-mode');
-    }
-  }, [isMonitorMode]);
-
-  if (isMonitorMode) {
-    return (
-      <MonitorView
-        session={session}
-        onPause={handlePause}
-        onResume={handleResume}
-        onStop={handleStop}
-      />
-    );
-  }
 
   return (
     <div
