@@ -1,0 +1,77 @@
+:root {
+  /* Brand / Primary Blue Palette */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-pressed: #1e40af;
+  --color-primary-soft: #dbeafe;
+  --color-primary-tint: #eff6ff;
+
+  /* Surfaces & Backgrounds */
+  --color-background: #f5f7fb;
+  --color-surface: #ffffff;
+  --color-border: #d8e0ec;
+
+  /* Text & Labels */
+  --color-text: #172033;
+  --color-text-secondary: #718096;
+
+  /* Status Colors */
+  --color-success: #0d9488;
+  --color-warning: #d97706;
+  --color-danger: #dc3545;
+  --color-track: #e5eaf2;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* Radii */
+  --radius-small: 6px;
+  --radius-control: 10px;
+  --radius-panel: 12px;
+  --radius-icon: 14px;
+
+  /* Sizing */
+  --border-width: 1px;
+  --control-height: 42px;
+  --list-row-height: 52px;
+
+  /* Fonts */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

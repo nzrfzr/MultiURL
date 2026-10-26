@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+html, body {
+  width: 520px;
+  height: 580px;
+  margin: 0;
+  padding: 0;
+  background-color: #F8FAFC;
+  color: #0F172A;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow: hidden;
+  user-select: none;
+}
+
+#root {
+  width: 520px;
+  height: 580px;
+  overflow: hidden;
+}
+
+/* Standalone floating monitor mode */
+html.monitor-mode,
+body.monitor-mode,
+#root.monitor-mode {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Custom Slim Scrollbar for URL list and Textarea */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Checkbox accent */
+input[type="checkbox"] {
+  accent-color: #2563EB;
+}

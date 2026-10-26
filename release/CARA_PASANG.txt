@@ -1,0 +1,22 @@
+=========================================================
+      CARA PASANG EKSTENSI MultiURL (DRAG & DROP)
+=========================================================
+
+Langkah cepat (hanya 10 detik):
+
+1. Ekstrak file MultiURL-v1.0.0.rar ini ke folder mana saja.
+   (Misal di Desktop atau folder Downloads).
+
+2. Buka Google Chrome (atau Edge / Brave).
+
+3. Masuk ke halaman ekstensi:
+   Ketik: chrome://extensions di address bar, lalu tekan Enter.
+
+4. Aktifkan saklar "Developer mode" (Mode Pengembang)
+   di pojok kanan atas halaman.
+
+5. TARIK (DRAG & DROP) folder "MultiURL" langsung ke 
+   tengah-tengah halaman chrome://extensions tersebut.
+
+6. Selesai! MultiURL langsung terpasang dan muncul di icon puzzle Chrome.
+   (Tips: Klik ikon puzzle di toolbar Chrome lalu klik pin MultiURL agar selalu tampil).
