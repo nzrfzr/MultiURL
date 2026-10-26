@@ -26,19 +26,54 @@ if (typeof chrome !== 'undefined' && chrome.runtime?.onConnect) {
     }
   });
 }
-// ─── Broadcast state updates to popup ────────────────────────────────────────
+// ─── Helper: send state to the single active tab ─────────────────────────────
+
+function sendToActiveTab(state: ReturnType<typeof controller.getState>): void {
+  if (typeof chrome === 'undefined' || !chrome.tabs?.query) return;
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    if (!tab?.id || tab.id < 0) return;
+    chrome.tabs.sendMessage(
+      tab.id,
+      { type: 'MULTIURL_STATE_UPDATE', state },
+      () => { void chrome.runtime.lastError; } // ignore "no receiver" errors
+    );
+  });
+}
+
+// ─── When the user switches tabs, forward current state to the new active tab ─
+
+if (typeof chrome !== 'undefined' && chrome.tabs?.onActivated) {
+  chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    await controller.whenReady();
+    const state = controller.getState();
+    if (activeInfo.tabId && activeInfo.tabId > 0) {
+      chrome.tabs.sendMessage(
+        activeInfo.tabId,
+        { type: 'MULTIURL_STATE_UPDATE', state },
+        () => { void chrome.runtime.lastError; }
+      );
+    }
+  });
+}
+
+// ─── Broadcast state updates ──────────────────────────────────────────────────
 
 controller.subscribe((state) => {
+  // 1. Notify the popup (if open)
   if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
     try {
       const p = chrome.runtime.sendMessage({ type: 'STATE_UPDATED', state });
       if (p && typeof (p as any).catch === 'function') {
-        (p as any).catch(() => { /* safe to ignore — popup may be closed */ });
+        (p as any).catch(() => { /* safe to ignore */ });
       }
     } catch {
       // Safe to ignore
     }
   }
+
+  // 2. Notify the active tab (content script floating widget)
+  sendToActiveTab(state);
 });
 
 
