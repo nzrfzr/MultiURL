@@ -18,21 +18,11 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.js"
-      ],
-      "run_at": "document_idle"
-    }
-  ],
   "permissions": [
     "tabs",
     "storage",
     "alarms",
-    "scripting"
+    "scripting",
+    "offscreen"
   ]
 }

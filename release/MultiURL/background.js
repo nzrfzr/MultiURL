@@ -1,160 +1,167 @@
-var x = Object.defineProperty;
-var A = (s, t, e) => t in s ? x(s, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : s[t] = e;
-var l = (s, t, e) => A(s, typeof t != "symbol" ? t + "" : t, e);
-function y(s) {
-  const t = Math.floor(s);
-  return isNaN(t) || t < 1 ? {
+var k = Object.defineProperty;
+var _ = (s, e, t) => e in s ? k(s, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : s[e] = t;
+var l = (s, e, t) => _(s, typeof e != "symbol" ? e + "" : e, t);
+function v(s) {
+  const e = Math.floor(s);
+  return isNaN(e) || e < 1 ? {
     isValid: !1,
     value: 10,
     error: "Limit must be at least 1"
-  } : t > 100 ? {
+  } : e > 100 ? {
     isValid: !1,
     value: 100,
     error: "Limit cannot exceed 100"
-  } : { isValid: !0, value: t };
+  } : { isValid: !0, value: e };
 }
-function u() {
+function d() {
   return typeof chrome < "u" && !!chrome.runtime && typeof chrome.runtime.sendMessage == "function";
 }
-async function E(s, t = !1) {
-  var e;
-  if (!u() || !chrome.tabs)
+async function D(s, e = !1) {
+  var t, i;
+  if (!d() || !((t = chrome.tabs) != null && t.create))
     return console.log("[Dev Mock] Created tab for URL:", s), Math.floor(Math.random() * 1e5) + 1;
   try {
-    const i = chrome.tabs.create({ url: s, active: t });
-    if (i && typeof i.then == "function") {
-      const a = await i;
-      if (!a || a.id === void 0)
+    const n = chrome.tabs.create({ url: s, active: e });
+    if (n && typeof n.then == "function") {
+      const r = await n;
+      if (!r || r.id === void 0)
         throw new Error("Failed to create tab: no tab ID returned by browser");
-      return a.id;
+      return r.id;
     }
-  } catch (i) {
-    if (i && ((e = i.message) != null && e.includes("tab ID")))
-      throw i;
+  } catch (n) {
+    if (n && ((i = n.message) != null && i.includes("tab ID")))
+      throw n;
   }
-  return new Promise((i, a) => {
+  return new Promise((n, r) => {
     try {
-      chrome.tabs.create({ url: s, active: t }, (n) => {
+      chrome.tabs.create({ url: s, active: e }, (a) => {
         var h;
-        const o = (h = chrome.runtime) == null ? void 0 : h.lastError;
-        o ? a(new Error(o.message || "Failed to create tab")) : !n || n.id === void 0 ? a(new Error("Failed to create tab: no tab ID returned by browser")) : i(n.id);
+        const c = (h = chrome.runtime) == null ? void 0 : h.lastError;
+        c ? r(new Error(c.message || "Failed to create tab")) : !a || a.id === void 0 ? r(new Error("Failed to create tab: no tab ID returned by browser")) : n(a.id);
       });
-    } catch (n) {
-      a(new Error((n == null ? void 0 : n.message) || "Failed to call chrome.tabs.create"));
+    } catch (a) {
+      r(new Error((a == null ? void 0 : a.message) || "Failed to call chrome.tabs.create"));
     }
   });
 }
-async function S(s) {
-  if (!u() || !chrome.tabs) return !1;
+async function b(s) {
+  if (!d() || !chrome.tabs) return !1;
   try {
-    const t = chrome.tabs.get(s);
-    if (t && typeof t.then == "function") {
-      const e = await t;
-      return !!e && e.id === s;
+    const e = chrome.tabs.get(s);
+    if (e && typeof e.then == "function") {
+      const t = await e;
+      return !!t && t.id === s;
     }
   } catch {
     return !1;
   }
-  return new Promise((t) => {
+  return new Promise((e) => {
     try {
-      chrome.tabs.get(s, (e) => {
+      chrome.tabs.get(s, (t) => {
         var i;
-        (i = chrome.runtime) != null && i.lastError || !e ? t(!1) : t(e.id === s);
+        (i = chrome.runtime) != null && i.lastError || !t ? e(!1) : e(t.id === s);
       });
     } catch {
-      t(!1);
+      e(!1);
     }
   });
 }
-function T(s) {
-  var e;
-  if (!u() || !((e = chrome.tabs) != null && e.onRemoved)) return () => {
+function w(s) {
+  var t;
+  if (!d() || !((t = chrome.tabs) != null && t.onRemoved)) return () => {
   };
-  const t = (i) => {
+  const e = (i) => {
     s(i);
   };
-  return chrome.tabs.onRemoved.addListener(t), () => {
-    chrome.tabs.onRemoved.removeListener(t);
+  return chrome.tabs.onRemoved.addListener(e), () => {
+    chrome.tabs.onRemoved.removeListener(e);
   };
 }
-function _(s) {
-  var e;
-  if (!u() || !((e = chrome.tabs) != null && e.onUpdated)) return () => {
-  };
-  const t = (i, a) => {
-    a.status && s(i, a.status);
-  };
-  return chrome.tabs.onUpdated.addListener(t), () => {
-    chrome.tabs.onUpdated.removeListener(t);
-  };
-}
-function k(s) {
-  var e;
-  if (!u() || !((e = chrome.tabs) != null && e.onReplaced)) return () => {
-  };
-  const t = (i, a) => {
-    s(i, a);
-  };
-  return chrome.tabs.onReplaced.addListener(t), () => {
-    chrome.tabs.onReplaced.removeListener(t);
-  };
-}
-async function P(s) {
+function P(s) {
   var t;
-  if (!u() || !((t = chrome.storage) != null && t.local))
+  if (!d() || !((t = chrome.tabs) != null && t.onUpdated)) return () => {
+  };
+  const e = (i, n) => {
+    n.status && s(i, n.status);
+  };
+  return chrome.tabs.onUpdated.addListener(e), () => {
+    chrome.tabs.onUpdated.removeListener(e);
+  };
+}
+function O(s) {
+  var t;
+  if (!d() || !((t = chrome.tabs) != null && t.onReplaced)) return () => {
+  };
+  const e = (i, n) => {
+    s(i, n);
+  };
+  return chrome.tabs.onReplaced.addListener(e), () => {
+    chrome.tabs.onReplaced.removeListener(e);
+  };
+}
+async function N(s) {
+  var e;
+  if (!d() || !((e = chrome.storage) != null && e.local))
     try {
-      const e = localStorage.getItem(`multiurls_${s}`);
-      return e ? JSON.parse(e) : null;
+      const t = localStorage.getItem(`multiurls_${s}`);
+      return t ? JSON.parse(t) : null;
     } catch {
       return null;
     }
-  return new Promise((e) => {
+  return new Promise((t) => {
     chrome.storage.local.get([s], (i) => {
-      e(i[s] ?? null);
+      t(i[s] ?? null);
     });
   });
 }
-async function D(s, t) {
-  var e;
-  if (!u() || !((e = chrome.storage) != null && e.local)) {
+async function B(s, e) {
+  var t;
+  if (!d() || !((t = chrome.storage) != null && t.local)) {
     try {
-      localStorage.setItem(`multiurls_${s}`, JSON.stringify(t));
+      localStorage.setItem(`multiurls_${s}`, JSON.stringify(e));
     } catch {
     }
     return;
   }
   return new Promise((i) => {
-    chrome.storage.local.set({ [s]: t }, () => i());
+    chrome.storage.local.set({ [s]: e }, () => i());
   });
 }
-const U = "multiurls_queue_session_v1";
-let p = Promise.resolve();
-function N(s) {
-  const t = JSON.parse(JSON.stringify(s));
-  return p = p.then(async () => {
+function f(s, e) {
+  if (!(!d() || !chrome.action))
     try {
-      await D(U, t);
-    } catch (e) {
-      console.warn("[MultiURL] Failed to save session state:", e);
+      typeof chrome.action.setBadgeText == "function" && chrome.action.setBadgeText({ text: s || "" }), e && typeof chrome.action.setBadgeBackgroundColor == "function" && chrome.action.setBadgeBackgroundColor({ color: e });
+    } catch {
     }
-  }), p;
 }
-async function O() {
-  return await P(U);
-}
-const R = "multiurls_tick", w = "multiurls_watchdog";
+const E = "multiurls_queue_session_v1";
+let I = Promise.resolve();
 function W(s) {
-  var t;
-  typeof chrome < "u" && ((t = chrome.alarms) != null && t.create) && chrome.alarms.clear(R, () => {
-    const e = Math.max(0.1, s / 60);
-    chrome.alarms.create(R, { delayInMinutes: e });
+  const e = JSON.parse(JSON.stringify(s));
+  return I = I.then(async () => {
+    try {
+      await B(E, e);
+    } catch (t) {
+      console.warn("[MultiURL] Failed to save session state:", t);
+    }
+  }), I;
+}
+async function $() {
+  return await N(E);
+}
+const y = "multiurls_tick", L = "multiurls_watchdog";
+function F(s) {
+  var e;
+  typeof chrome < "u" && ((e = chrome.alarms) != null && e.create) && chrome.alarms.clear(y, () => {
+    const t = Math.max(0.1, s / 60);
+    chrome.alarms.create(y, { delayInMinutes: t });
   });
 }
-function c() {
+function m() {
   var s;
-  typeof chrome < "u" && ((s = chrome.alarms) != null && s.clear) && chrome.alarms.clear(R);
+  typeof chrome < "u" && ((s = chrome.alarms) != null && s.clear) && chrome.alarms.clear(y);
 }
-class $ {
+class C {
   constructor() {
     l(this, "state");
     l(this, "timerId", null);
@@ -174,10 +181,10 @@ class $ {
     l(this, "isReady", !1);
     l(this, "readyPromise");
     l(this, "resolveReady");
-    this.state = this.getInitialState(), this.readyPromise = new Promise((t) => {
-      this.resolveReady = t;
-    }), this.setupListeners(), this.init().catch((t) => {
-      console.warn("[MultiURL] Controller init error:", t);
+    this.state = this.getInitialState(), this.readyPromise = new Promise((e) => {
+      this.resolveReady = e;
+    }), this.setupListeners(), this.init().catch((e) => {
+      console.warn("[MultiURL] Controller init error:", e);
     });
   }
   async whenReady() {
@@ -185,10 +192,10 @@ class $ {
   }
   async init() {
     try {
-      const t = await O();
-      this.isReady = !0, this.resolveReady && this.resolveReady(), this.state.status === "idle" && t && (t.status === "running" || t.status === "paused" ? (console.log("[MultiURL] Restoring session from storage, status:", t.status), await this.restoreAndResume(t)) : this.state = { ...t });
-    } catch (t) {
-      console.warn("[MultiURL] Failed to load session state in init:", t), this.isReady = !0, this.resolveReady && this.resolveReady();
+      const e = await $();
+      this.isReady = !0, this.resolveReady && this.resolveReady(), this.state.status === "idle" && e && (e.status === "running" || e.status === "paused" ? (console.log("[MultiURL] Restoring session from storage, status:", e.status), await this.restoreAndResume(e)) : this.state = { ...e });
+    } catch (e) {
+      console.warn("[MultiURL] Failed to load session state in init:", e), this.isReady = !0, this.resolveReady && this.resolveReady();
     }
   }
   getInitialState() {
@@ -210,44 +217,46 @@ class $ {
   getState() {
     return { ...this.state };
   }
-  subscribe(t) {
-    return this.listeners.add(t), () => this.listeners.delete(t);
+  subscribe(e) {
+    return this.listeners.add(e), () => this.listeners.delete(e);
   }
   notify() {
-    this.state.updatedAt = Date.now(), N(this.state).catch(
-      (t) => console.warn("Failed to persist session state:", t)
+    this.state.updatedAt = Date.now(), W(this.state).catch(
+      (e) => console.warn("Failed to persist session state:", e)
     );
-    for (const t of this.listeners)
-      t(this.getState());
+    for (const e of this.listeners)
+      e(this.getState());
   }
   setupListeners() {
-    this.tabRemovedUnsub = T((t) => {
-      this.handleTabRemoved(t).catch(
-        (e) => console.warn("[MultiURL] handleTabRemoved error:", e)
-      );
-    }), this.tabReplacedUnsub = k((t, e) => {
-      this.handleTabReplaced(t, e);
+    this.tabRemovedUnsub = w((e) => {
+      try {
+        this.handleTabRemoved(e);
+      } catch (t) {
+        console.warn("[MultiURL] handleTabRemoved error:", t);
+      }
+    }), this.tabReplacedUnsub = O((e, t) => {
+      this.handleTabReplaced(e, t);
     });
   }
-  handleTabReplaced(t, e) {
-    const i = this.state.managedTabIds.indexOf(e);
+  handleTabReplaced(e, t) {
+    const i = this.state.managedTabIds.indexOf(t);
     if (i !== -1) {
-      this.state.managedTabIds[i] = t;
-      const a = this.state.tabToEntryIdMap[e];
-      a && (delete this.state.tabToEntryIdMap[e], this.state.tabToEntryIdMap[t] = a), this.notify();
+      this.state.managedTabIds[i] = e;
+      const n = this.state.tabToEntryIdMap[t];
+      n && (delete this.state.tabToEntryIdMap[t], this.state.tabToEntryIdMap[e] = n), this.notify();
     }
   }
   startWatchdog() {
-    var t;
-    this.stopWatchdog(), typeof chrome < "u" && ((t = chrome.alarms) != null && t.create) && chrome.alarms.create(w, { periodInMinutes: 0.2 }), this.watchdogTimerId = setInterval(() => {
+    var e;
+    this.stopWatchdog(), typeof chrome < "u" && ((e = chrome.alarms) != null && e.create) && chrome.alarms.create(L, { periodInMinutes: 0.2 }), this.watchdogTimerId = setInterval(() => {
       this.checkAndReconcileQueue().catch(
-        (e) => console.warn("[MultiURL] Watchdog reconcile error:", e)
+        (t) => console.warn("[MultiURL] Watchdog reconcile error:", t)
       );
     }, 2500);
   }
   stopWatchdog() {
-    var t;
-    this.watchdogTimerId && (clearInterval(this.watchdogTimerId), this.watchdogTimerId = null), typeof chrome < "u" && ((t = chrome.alarms) != null && t.clear) && chrome.alarms.clear(w);
+    var e;
+    this.watchdogTimerId && (clearInterval(this.watchdogTimerId), this.watchdogTimerId = null), typeof chrome < "u" && ((e = chrome.alarms) != null && e.clear) && chrome.alarms.clear(L);
   }
   /**
    * Reconciles managed tabs against live browser tabs.
@@ -256,87 +265,103 @@ class $ {
   async checkAndReconcileQueue() {
     if (await this.whenReady(), this.state.status !== "running" || this.state.mode !== "queue")
       return;
-    const t = [...this.state.managedTabIds], e = await Promise.all(
-      t.map(async (o) => ({ id: o, alive: await S(o) }))
+    const e = [...this.state.managedTabIds], t = await Promise.all(
+      e.map(async (a) => ({ id: a, alive: await b(a) }))
     ), i = [];
-    for (const o of e)
-      o.alive ? i.push(o.id) : delete this.state.tabToEntryIdMap[o.id];
-    const a = i.length !== this.state.managedTabIds.length;
+    for (const a of t)
+      a.alive ? i.push(a.id) : delete this.state.tabToEntryIdMap[a.id];
+    const n = i.length !== this.state.managedTabIds.length;
     this.state.managedTabIds = i;
-    const n = this.state.entries.length - this.state.nextIndex;
-    if (n === 0 && this.state.managedTabIds.length === 0) {
+    const r = this.state.entries.length - this.state.nextIndex;
+    if (r === 0 && this.state.managedTabIds.length === 0) {
       this.state.status = "completed", this.state.statusMessage = "All URLs completed and managed tabs closed", this.stopWatchdog(), this.notify();
       return;
     }
-    this.state.managedTabIds.length < this.state.limit && n > 0 ? await this.processNextBatch() : a && this.notify();
+    this.state.managedTabIds.length < this.state.limit && r > 0 ? await this.processNextBatch() : n && this.notify();
   }
   destroy() {
-    this.currentRunId++, c(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.tabRemovedUnsub && this.tabRemovedUnsub(), this.tabReplacedUnsub && this.tabReplacedUnsub(), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.isProcessing = !1, this.pendingRefill = !1, this.listeners.clear();
+    this.currentRunId++, m(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.tabRemovedUnsub && this.tabRemovedUnsub(), this.tabReplacedUnsub && this.tabReplacedUnsub(), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.isProcessing = !1, this.pendingRefill = !1, this.listeners.clear();
   }
-  async start(t, e, i, a) {
-    await this.whenReady(), this.currentRunId++, c(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1;
-    const n = y(a).value, o = {};
-    e.forEach((h) => {
-      o[h.id] = "queued";
+  async start(e, t, i, n) {
+    await this.whenReady(), this.currentRunId++, m(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1;
+    const r = v(n).value, a = {};
+    t.forEach((c) => {
+      a[c.id] = "queued";
     }), this.state = {
       sessionId: `session_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       status: "running",
-      mode: t,
+      mode: e,
       delaySeconds: Math.max(0.5, i),
-      limit: n,
-      entries: e,
+      limit: r,
+      entries: t,
       nextIndex: 0,
       managedTabIds: [],
       tabToEntryIdMap: {},
-      entryOutcomes: o,
+      entryOutcomes: a,
       statusMessage: "Opening URLs...",
       startedAt: Date.now(),
       updatedAt: Date.now()
-    }, t === "queue" && this.startWatchdog(), this.notify(), await this.processNextBatch();
+    }, e === "queue" && this.startWatchdog(), this.notify(), await this.processNextBatch();
   }
   /**
    * Restore a previously persisted session (e.g. after service worker restart)
    * and resume processing if the session was running.
    */
-  async restoreAndResume(t) {
-    this.currentRunId++, c(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1, this.state = { ...t }, this.state.status === "running" ? (this.state.mode === "queue" && this.startWatchdog(), this.state.statusMessage = "Resuming after browser restart...", this.notify(), await this.processNextBatch()) : this.notify();
+  async restoreAndResume(e) {
+    var r;
+    this.currentRunId++, m(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1;
+    const i = (await Promise.all(
+      (e.managedTabIds ?? []).map(async (a) => ({ id: a, alive: await b(a) }))
+    )).filter((a) => a.alive).map((a) => a.id), n = {};
+    for (const a of i)
+      (r = e.tabToEntryIdMap) != null && r[a] && (n[a] = e.tabToEntryIdMap[a]);
+    this.state = {
+      ...e,
+      managedTabIds: i,
+      tabToEntryIdMap: n
+    }, this.state.status === "running" ? (this.state.mode === "queue" && this.startWatchdog(), this.state.statusMessage = "Resuming session...", this.notify(), await this.processNextBatch()) : this.notify();
   }
   /**
    * Called by the chrome.alarms listener in index.ts when the
    * 'multiurls_tick' alarm fires. Resolves the pending wait promise so the
    * interval/after_load loop can dispatch the next URL.
    */
-  handleAlarmTick() {
-    if (console.log("[MultiURL] Alarm tick received"), this.alarmTickResolver) {
-      const t = this.alarmTickResolver;
-      this.alarmTickResolver = null, t();
+  async handleAlarmTick() {
+    if (await this.whenReady(), console.log("[MultiURL] Alarm tick received"), this.alarmTickResolver) {
+      const e = this.alarmTickResolver;
+      this.alarmTickResolver = null, e();
     } else !this.isProcessing && this.state.status === "running" && this.processNextBatch().catch(
-      (t) => console.error("[MultiURL] handleAlarmTick processNextBatch error:", t)
+      (e) => console.error("[MultiURL] handleAlarmTick processNextBatch error:", e)
     );
   }
   pause() {
-    this.state.status === "running" && (c(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1, this.state.status = "paused", this.state.statusMessage = "Paused — Tabs remain open", this.notify());
+    this.state.status === "running" && (m(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1, this.state.status = "paused", this.state.statusMessage = "Paused — Tabs remain open", this.notify());
   }
   resume() {
     this.state.status === "paused" && (this.state.status = "running", this.state.statusMessage = "Resuming...", this.state.mode === "queue" && this.startWatchdog(), this.notify(), this.processNextBatch());
   }
   stop() {
-    this.currentRunId++, c(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1, this.state.status = "stopped", this.state.statusMessage = "Stopped by user — Opened tabs preserved", this.notify();
+    this.currentRunId++, m(), this.stopWatchdog(), this.timerId && (clearTimeout(this.timerId), this.timerId = null), this.pendingTimerResolver && (this.pendingTimerResolver(), this.pendingTimerResolver = null), this.pendingLoadResolver && (this.pendingLoadResolver(), this.pendingLoadResolver = null), this.alarmTickResolver && (this.alarmTickResolver(), this.alarmTickResolver = null), this.isProcessing = !1, this.pendingRefill = !1, this.state.status = "stopped", this.state.statusMessage = "Stopped by user — Opened tabs preserved", this.notify();
   }
-  updateLimit(t) {
-    const e = y(t).value, i = this.state.limit;
-    this.state.limit = e, this.notify(), this.state.status === "running" && this.state.mode === "queue" && e > i && this.processNextBatch();
+  updateLimit(e) {
+    const t = v(e).value, i = this.state.limit;
+    this.state.limit = t, this.notify(), this.state.status === "running" && this.state.mode === "queue" && t > i && this.processNextBatch();
   }
-  async handleTabRemoved(t) {
-    await this.whenReady();
-    const e = this.state.managedTabIds.indexOf(t);
-    if (e === -1)
+  handleTabRemoved(e) {
+    if (!this.isReady) {
+      this.whenReady().then(() => this.handleTabRemoved(e));
       return;
-    if (this.state.managedTabIds.splice(e, 1), delete this.state.tabToEntryIdMap[t], this.state.entries.length - this.state.nextIndex === 0 && this.state.managedTabIds.length === 0) {
+    }
+    const t = this.state.managedTabIds.indexOf(e);
+    if (t === -1)
+      return;
+    if (this.state.managedTabIds.splice(t, 1), delete this.state.tabToEntryIdMap[e], this.state.entries.length - this.state.nextIndex === 0 && this.state.managedTabIds.length === 0) {
       this.state.status === "running" && (this.state.status = "completed", this.state.statusMessage = "All URLs completed and managed tabs closed", this.stopWatchdog(), this.notify());
       return;
     }
-    this.state.status === "running" && this.state.mode === "queue" ? await this.processNextBatch() : this.notify();
+    this.state.status === "running" && this.state.mode === "queue" ? this.isProcessing ? (this.pendingRefill = !0, this.notify()) : this.processNextBatch().catch(
+      (n) => console.warn("[MultiURL] processNextBatch error in handleTabRemoved:", n)
+    ) : this.notify();
   }
   async processNextBatch() {
     if (this.state.status === "running") {
@@ -355,190 +380,178 @@ class $ {
       }
     }
   }
-  async dispatchUrl(t) {
-    this.state.entryOutcomes[t.id] = "opening", this.notify();
+  async dispatchUrl(e) {
+    this.state.entryOutcomes[e.id] = "opening";
     try {
-      const e = await E(t.normalizedUrl);
-      return this.state.entryOutcomes[t.id] = "opened", e;
-    } catch (e) {
-      const i = e instanceof Error ? e.message : String(e);
-      return console.error(`Failed to open tab for ${t.normalizedUrl}:`, i), this.state.entryOutcomes[t.id] = "failed", this.state.lastError = i, null;
+      const t = await D(e.normalizedUrl);
+      return this.state.entryOutcomes[e.id] = "opened", t;
+    } catch (t) {
+      const i = t instanceof Error ? t.message : String(t);
+      return console.error(`Failed to open tab for ${e.normalizedUrl}:`, i), this.state.entryOutcomes[e.id] = "failed", this.state.lastError = i, null;
     }
   }
   async runOpenAll() {
-    const t = this.currentRunId;
-    for (; this.state.status === "running" && this.currentRunId === t && this.state.nextIndex < this.state.entries.length; ) {
-      const e = this.state.entries[this.state.nextIndex];
-      this.state.nextIndex++, await this.dispatchUrl(e);
+    const e = this.currentRunId;
+    for (; this.state.status === "running" && this.currentRunId === e && this.state.nextIndex < this.state.entries.length; ) {
+      const t = this.state.entries[this.state.nextIndex];
+      this.state.nextIndex++, await this.dispatchUrl(t);
     }
-    this.state.nextIndex >= this.state.entries.length && this.state.status === "running" && this.currentRunId === t && (this.state.status = "completed", this.state.statusMessage = "All URLs opened successfully", this.notify());
+    this.state.nextIndex >= this.state.entries.length && this.state.status === "running" && this.currentRunId === e && (this.state.status = "completed", this.state.statusMessage = "All URLs opened successfully", this.notify());
   }
   async runInterval() {
-    const t = this.currentRunId;
-    for (; this.state.status === "running" && this.currentRunId === t && this.state.nextIndex < this.state.entries.length; ) {
-      const e = this.state.entries[this.state.nextIndex];
-      if (this.state.nextIndex++, await this.dispatchUrl(e), this.state.status !== "running" || this.currentRunId !== t) break;
+    const e = this.currentRunId;
+    for (; this.state.status === "running" && this.currentRunId === e && this.state.nextIndex < this.state.entries.length; ) {
+      const t = this.state.entries[this.state.nextIndex];
+      if (this.state.nextIndex++, await this.dispatchUrl(t), this.state.status !== "running" || this.currentRunId !== e) break;
       if (this.state.nextIndex < this.state.entries.length) {
         const i = this.state.delaySeconds;
-        this.state.statusMessage = `Waiting ${i}s before next URL...`, this.notify(), W(i), await new Promise((a) => {
-          this.alarmTickResolver = a, this.pendingTimerResolver = a, this.timerId = setTimeout(() => {
-            this.timerId = null, this.pendingTimerResolver = null, c(), this.alarmTickResolver === a && (this.alarmTickResolver = null), a();
+        this.state.statusMessage = `Waiting ${i}s before next URL...`, this.notify(), F(i), await new Promise((n) => {
+          this.alarmTickResolver = n, this.pendingTimerResolver = n, this.timerId = setTimeout(() => {
+            this.timerId = null, this.pendingTimerResolver = null, m(), this.alarmTickResolver === n && (this.alarmTickResolver = null), n();
           }, i * 1e3);
         });
       }
     }
-    this.state.nextIndex >= this.state.entries.length && this.state.status === "running" && this.currentRunId === t && (c(), this.state.status = "completed", this.state.statusMessage = "All URLs opened successfully", this.notify());
+    this.state.nextIndex >= this.state.entries.length && this.state.status === "running" && this.currentRunId === e && (m(), this.state.status = "completed", this.state.statusMessage = "All URLs opened successfully", this.notify());
   }
   /**
    * Waits for a created tab to report status === 'complete' or 8s timeout safeguard.
    */
-  waitForTabToLoad(t, e = 8e3) {
+  waitForTabToLoad(e, t = 8e3) {
     return new Promise((i) => {
-      var I;
-      let a = !1, n = null, o = null, h = null;
-      const f = () => {
-        a || (a = !0, n && n(), o && o(), h && clearTimeout(h), this.pendingLoadResolver = null, i());
+      var T;
+      let n = !1, r = null, a = null, c = null;
+      const h = () => {
+        n || (n = !0, r && r(), a && a(), c && clearTimeout(c), this.pendingLoadResolver = null, i());
       };
-      this.pendingLoadResolver = f, h = setTimeout(f, e), typeof chrome < "u" && ((I = chrome.tabs) != null && I.get) && chrome.tabs.get(t, (d) => {
-        var g;
-        !((g = chrome.runtime) != null && g.lastError) && (d == null ? void 0 : d.status) === "complete" && f();
-      }), n = _((d, g) => {
-        d === t && g === "complete" && f();
-      }), o = T((d) => {
-        d === t && f();
+      this.pendingLoadResolver = h, c = setTimeout(h, t), typeof chrome < "u" && ((T = chrome.tabs) != null && T.get) && chrome.tabs.get(e, (u) => {
+        var R;
+        !((R = chrome.runtime) != null && R.lastError) && (u == null ? void 0 : u.status) === "complete" && h();
+      }), r = P((u, R) => {
+        u === e && R === "complete" && h();
+      }), a = w((u) => {
+        u === e && h();
       });
     });
   }
   async runAfterLoad() {
-    const t = this.currentRunId;
-    for (; this.state.status === "running" && this.currentRunId === t && this.state.nextIndex < this.state.entries.length; ) {
-      const e = this.state.entries[this.state.nextIndex];
-      this.state.nextIndex++, this.state.statusMessage = `Opening (${this.state.nextIndex}/${this.state.entries.length}): ${e.normalizedUrl}`, this.notify();
-      const i = await this.dispatchUrl(e);
-      if (this.state.status !== "running" || this.currentRunId !== t) break;
-      i && this.state.nextIndex < this.state.entries.length && (this.state.statusMessage = `Waiting for page load (${this.state.nextIndex}/${this.state.entries.length}): ${e.normalizedUrl}`, this.notify(), await this.waitForTabToLoad(i, 8e3));
+    const e = this.currentRunId;
+    for (; this.state.status === "running" && this.currentRunId === e && this.state.nextIndex < this.state.entries.length; ) {
+      const t = this.state.entries[this.state.nextIndex];
+      this.state.nextIndex++, this.state.statusMessage = `Opening (${this.state.nextIndex}/${this.state.entries.length}): ${t.normalizedUrl}`, this.notify();
+      const i = await this.dispatchUrl(t);
+      if (this.state.status !== "running" || this.currentRunId !== e) break;
+      i && this.state.nextIndex < this.state.entries.length && (this.state.statusMessage = `Waiting for page load (${this.state.nextIndex}/${this.state.entries.length}): ${t.normalizedUrl}`, this.notify(), await this.waitForTabToLoad(i, 8e3));
     }
-    this.state.nextIndex >= this.state.entries.length && this.state.status === "running" && this.currentRunId === t && (this.state.status = "completed", this.state.statusMessage = "All URLs opened successfully", this.notify());
+    this.state.nextIndex >= this.state.entries.length && this.state.status === "running" && this.currentRunId === e && (this.state.status = "completed", this.state.statusMessage = "All URLs opened successfully", this.notify());
   }
   async runQueueRefill() {
-    const t = this.currentRunId;
-    if (this.state.status !== "running" || this.currentRunId !== t) return;
-    for (; this.state.status === "running" && this.currentRunId === t && this.state.managedTabIds.length < this.state.limit && this.state.nextIndex < this.state.entries.length; ) {
-      const a = this.state.entries[this.state.nextIndex];
+    const e = this.currentRunId;
+    if (this.state.status !== "running" || this.currentRunId !== e) return;
+    for (; this.state.status === "running" && this.currentRunId === e && this.state.managedTabIds.length < this.state.limit && this.state.nextIndex < this.state.entries.length; ) {
+      const n = this.state.entries[this.state.nextIndex];
       this.state.nextIndex++;
-      const n = await this.dispatchUrl(a);
-      n && (this.state.managedTabIds.push(n), this.state.tabToEntryIdMap[n] = a.id);
+      const r = await this.dispatchUrl(n);
+      r && (this.state.managedTabIds.push(r), this.state.tabToEntryIdMap[r] = n.id);
     }
-    const e = this.state.nextIndex >= this.state.entries.length, i = this.state.managedTabIds.length;
-    e ? i > 0 ? this.state.statusMessage = `All URLs opened — ${i} managed tab${i > 1 ? "s" : ""} still open` : (this.state.status = "completed", this.state.statusMessage = "All URLs opened and managed tabs closed", this.stopWatchdog()) : this.state.statusMessage = `Queue running: ${i}/${this.state.limit} slots active`, this.notify();
+    const t = this.state.nextIndex >= this.state.entries.length, i = this.state.managedTabIds.length;
+    t ? i > 0 ? this.state.statusMessage = `All URLs opened — ${i} managed tab${i > 1 ? "s" : ""} still open` : (this.state.status = "completed", this.state.statusMessage = "All URLs opened and managed tabs closed", this.stopWatchdog()) : this.state.statusMessage = `Queue running: ${i}/${this.state.limit} slots active`, this.notify();
   }
 }
-console.log("[MultiURL] Background service worker initialized.");
-const r = new $();
-var b;
-typeof chrome < "u" && ((b = chrome.alarms) != null && b.onAlarm) && chrome.alarms.onAlarm.addListener((s) => {
-  s.name === "multiurls_tick" ? r.handleAlarmTick() : s.name === "multiurls_watchdog" && r.checkAndReconcileQueue().catch(
-    (t) => console.warn("[MultiURL] Watchdog alarm error:", t)
-  );
-});
-let m = null;
-async function F() {
-  var t;
-  if (typeof chrome > "u" || !((t = chrome.windows) != null && t.create)) return;
-  if (m !== null)
+let p = !1;
+async function S() {
+  var s, e;
+  if (!p && !(typeof chrome > "u" || !((s = chrome.offscreen) != null && s.createDocument)))
     try {
-      const e = await chrome.windows.get(m);
-      if (e && e.id) {
-        chrome.windows.update(e.id, { focused: !1 });
+      if (chrome.offscreen.hasDocument && await chrome.offscreen.hasDocument()) {
+        p = !0;
         return;
       }
-    } catch {
-      m = null;
+      const t = ((e = chrome.offscreen.Reason) == null ? void 0 : e.BLOBS) ?? "BLOBS";
+      await chrome.offscreen.createDocument({
+        url: "offscreen.html",
+        reasons: [t],
+        justification: "Keep queue processing active in background without popup open"
+      }), p = !0, console.log("[MultiURL] Offscreen keepalive document active");
+    } catch (t) {
+      console.warn("[MultiURL] Offscreen keepalive notice:", t), p = !0;
     }
-  const s = chrome.runtime.getURL("popup.html?view=monitor");
-  try {
-    const e = await chrome.windows.create({
-      url: s,
-      type: "popup",
-      width: 440,
-      height: 300,
-      focused: !1
-    });
-    e && e.id !== void 0 && (m = e.id);
-  } catch (e) {
-    console.warn("[MultiURL] Could not create monitor window:", e);
-  }
 }
-var v;
-typeof chrome < "u" && ((v = chrome.windows) != null && v.onRemoved) && chrome.windows.onRemoved.addListener((s) => {
-  s === m && (m = null);
-});
-function q(s) {
-  var t;
-  typeof chrome > "u" || !((t = chrome.tabs) != null && t.query) || chrome.tabs.query({}, (e) => {
-    if (!(!e || e.length === 0))
-      for (const i of e)
-        i.id && i.id > 0 && chrome.tabs.sendMessage(
-          i.id,
-          { type: "MULTIURL_STATE_UPDATE", state: s },
-          () => {
-            chrome.runtime.lastError;
-          }
-          // ignore "no receiver" errors
-        );
-  });
-}
-var L;
-typeof chrome < "u" && ((L = chrome.tabs) != null && L.onActivated) && chrome.tabs.onActivated.addListener(async (s) => {
-  await r.whenReady();
-  const t = r.getState();
-  s.tabId && s.tabId > 0 && chrome.tabs.sendMessage(
-    s.tabId,
-    { type: "MULTIURL_STATE_UPDATE", state: t },
-    () => {
-      chrome.runtime.lastError;
+async function q() {
+  var s;
+  if (p = !1, !(typeof chrome > "u" || !((s = chrome.offscreen) != null && s.closeDocument)))
+    try {
+      chrome.offscreen.hasDocument && await chrome.offscreen.hasDocument() && (await chrome.offscreen.closeDocument(), console.log("[MultiURL] Offscreen keepalive document closed"));
+    } catch (e) {
+      console.warn("[MultiURL] Error closing offscreen keepalive:", e);
     }
+}
+console.log("[MultiURL] Background service worker initialized.");
+const o = new C();
+var M;
+typeof chrome < "u" && ((M = chrome.alarms) != null && M.onAlarm) && chrome.alarms.onAlarm.addListener((s) => {
+  s.name === "multiurls_tick" ? o.handleAlarmTick().catch(
+    (e) => console.warn("[MultiURL] Alarm tick error:", e)
+  ) : s.name === "multiurls_watchdog" && o.checkAndReconcileQueue().catch(
+    (e) => console.warn("[MultiURL] Watchdog alarm error:", e)
   );
 });
-r.subscribe((s) => {
-  var t;
-  if (typeof chrome < "u" && ((t = chrome.runtime) != null && t.sendMessage))
+var x;
+typeof chrome < "u" && ((x = chrome.runtime) != null && x.onConnect) && chrome.runtime.onConnect.addListener((s) => {
+  s.name === "multiurl_keepalive" && (s.onMessage.addListener((e) => {
+  }), s.onDisconnect.addListener(() => {
+  }));
+});
+var U;
+typeof chrome < "u" && ((U = chrome.runtime) != null && U.onStartup) && chrome.runtime.onStartup.addListener(async () => {
+  await o.whenReady(), o.getState().status === "running" && S().catch(() => {
+  });
+});
+let g = null;
+o.subscribe((s) => {
+  var e;
+  if (typeof chrome < "u" && ((e = chrome.runtime) != null && e.sendMessage))
     try {
-      const e = chrome.runtime.sendMessage({ type: "STATE_UPDATED", state: s });
-      e && typeof e.catch == "function" && e.catch(() => {
+      const t = chrome.runtime.sendMessage({ type: "STATE_UPDATED", state: s });
+      t && typeof t.catch == "function" && t.catch(() => {
       });
     } catch {
     }
-  q(s);
+  if (s.status === "running" ? S().catch(() => {
+  }) : (s.status === "completed" || s.status === "stopped" || s.status === "idle") && q().catch(() => {
+  }), g && (clearTimeout(g), g = null), s.status === "running") {
+    const t = s.entries.length - s.nextIndex, i = t > 0 ? String(t) : s.managedTabIds.length > 0 ? String(s.managedTabIds.length) : "▶";
+    f(i, "#2563EB");
+  } else s.status === "paused" ? f("II", "#D97706") : s.status === "completed" ? (f("✓", "#059669"), g = setTimeout(() => {
+    g = null, o.getState().status === "completed" && f("", "");
+  }, 8e3)) : f("", "");
 });
 async function Q(s) {
-  switch (await r.whenReady(), s.type) {
+  switch (await o.whenReady(), s.type) {
     case "GET_STATE":
-      return { success: !0, data: r.getState() };
+      return { success: !0, data: o.getState() };
     case "START_QUEUE":
-      return await r.start(
+      return await o.start(
         s.mode,
         s.entries,
         s.delaySeconds,
         s.limit
-      ), F().catch(
-        (t) => console.warn("[MultiURL] openMonitorWindow error:", t)
-      ), { success: !0, data: r.getState() };
+      ), { success: !0, data: o.getState() };
     case "PAUSE_QUEUE":
-      return r.pause(), { success: !0, data: r.getState() };
+      return o.pause(), { success: !0, data: o.getState() };
     case "RESUME_QUEUE":
-      return r.resume(), { success: !0, data: r.getState() };
+      return o.resume(), { success: !0, data: o.getState() };
     case "STOP_QUEUE":
-      return r.stop(), { success: !0, data: r.getState() };
+      return o.stop(), { success: !0, data: o.getState() };
     case "UPDATE_LIMIT":
-      return r.updateLimit(s.limit), { success: !0, data: r.getState() };
+      return o.updateLimit(s.limit), { success: !0, data: o.getState() };
     default:
       return { success: !1, error: "Unknown message type" };
   }
 }
-var M;
-typeof chrome < "u" && ((M = chrome.runtime) != null && M.onMessage) && chrome.runtime.onMessage.addListener(
-  (s, t, e) => (Q(s).then(e).catch((i) => {
-    console.error("[MultiURL] handleMessage error:", i), e({ success: !1, error: String(i) });
+var A;
+typeof chrome < "u" && ((A = chrome.runtime) != null && A.onMessage) && chrome.runtime.onMessage.addListener(
+  (s, e, t) => (Q(s).then(t).catch((i) => {
+    console.error("[MultiURL] handleMessage error:", i), t({ success: !1, error: String(i) });
   }), !0)
 );

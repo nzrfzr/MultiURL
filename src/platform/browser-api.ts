@@ -194,3 +194,21 @@ export async function writeStorage<T>(key: string, value: T): Promise<void> {
     chrome.storage.local.set({ [key]: value }, () => resolve());
   });
 }
+
+/**
+ * Updates the extension toolbar icon badge with text and background color.
+ */
+export function updateBadge(text: string, color?: string): void {
+  if (!hasExtensionApi() || !chrome.action) return;
+  try {
+    if (typeof chrome.action.setBadgeText === 'function') {
+      chrome.action.setBadgeText({ text: text || '' });
+    }
+    if (color && typeof chrome.action.setBadgeBackgroundColor === 'function') {
+      chrome.action.setBadgeBackgroundColor({ color });
+    }
+  } catch {
+    // Safe to ignore in environments without action permission
+  }
+}
+

@@ -13,7 +13,9 @@ export const Footer: React.FC = () => {
         height: 16,
       }}
     >
-      <span>Tasks continue if you close this popup</span>
+      <span>Active in background</span>
+      <span style={{ color: '#CBD5E1' }}>•</span>
+      <span>Tasks continue if popup is closed</span>
       <span style={{ color: '#CBD5E1' }}>•</span>
       <span>by</span>
       <span

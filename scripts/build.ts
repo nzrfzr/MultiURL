@@ -71,42 +71,28 @@ async function buildTarget(target: 'chrome' | 'firefox') {
     },
   });
 
-  // 3. Build Content Script (floating process widget)
-  console.log(`  -> Bundling Content Script...`);
-  await build({
-    root: rootDir,
-    configFile: false,
-    resolve: {
-      alias: {
-        '@': path.join(rootDir, 'src'),
-      },
-    },
-    build: {
-      outDir,
-      emptyOutDir: false,
-      lib: {
-        entry: path.join(rootDir, 'src', 'content', 'process-popup.ts'),
-        name: 'content',
-        formats: ['iife'],
-        fileName: () => 'content.js',
-      },
-      rollupOptions: {
-        output: {
-          extend: true,
-        },
-      },
-    },
-  });
+  // 3. For Chrome: Copy Offscreen Keepalive Documents
+  if (target === 'chrome') {
+    console.log(`  -> Copying Offscreen Keepalive Worker...`);
+    const offscreenHtml = path.join(rootDir, 'src', 'offscreen', 'offscreen.html');
+    const offscreenJs = path.join(rootDir, 'src', 'offscreen', 'offscreen.js');
+    if (fs.existsSync(offscreenHtml)) {
+      fs.copyFileSync(offscreenHtml, path.join(outDir, 'offscreen.html'));
+    }
+    if (fs.existsSync(offscreenJs)) {
+      fs.copyFileSync(offscreenJs, path.join(outDir, 'offscreen.js'));
+    }
+  }
 
   // 4. Copy Manifest
   console.log(`  -> Validating & copying manifest...`);
   const manifestPath = path.join(rootDir, 'manifests', `${target}.json`);
   const manifestContent = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-  
+
   if (!manifestContent.name || !manifestContent.version || !manifestContent.manifest_version) {
     throw new Error(`Invalid manifest for ${target}`);
   }
-  
+
   fs.writeFileSync(
     path.join(outDir, 'manifest.json'),
     JSON.stringify(manifestContent, null, 2)
@@ -120,6 +106,20 @@ async function buildTarget(target: 'chrome' | 'firefox') {
   fs.copyFileSync(rawIconPath, path.join(iconsDir, 'icon-16.png'));
   fs.copyFileSync(rawIconPath, path.join(iconsDir, 'icon-48.png'));
   fs.copyFileSync(rawIconPath, path.join(iconsDir, 'icon-128.png'));
+
+  // 6. For Chrome: Mirror to release/MultiURL folder for instant drag-and-drop loading
+  if (target === 'chrome') {
+    const releaseTargetDir = path.join(rootDir, 'release', 'MultiURL');
+    if (fs.existsSync(releaseTargetDir)) {
+      console.log(`  -> Syncing build to release/MultiURL...`);
+      fs.cpSync(outDir, releaseTargetDir, { recursive: true, force: true });
+      // Remove any leftover old content.js if present in release/MultiURL
+      const oldContentJs = path.join(releaseTargetDir, 'content.js');
+      if (fs.existsSync(oldContentJs)) {
+        fs.rmSync(oldContentJs);
+      }
+    }
+  }
 
   console.log(`✅ Build for ${target.toUpperCase()} completed successfully! Output: dist/${target}/`);
 }

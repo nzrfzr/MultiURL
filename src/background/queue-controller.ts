@@ -376,7 +376,8 @@ export class QueueController {
    * 'multiurls_tick' alarm fires. Resolves the pending wait promise so the
    * interval/after_load loop can dispatch the next URL.
    */
-  public handleAlarmTick(): void {
+  public async handleAlarmTick(): Promise<void> {
+    await this.whenReady();
     console.log('[MultiURL] Alarm tick received');
     if (this.alarmTickResolver) {
       const resolve = this.alarmTickResolver;
