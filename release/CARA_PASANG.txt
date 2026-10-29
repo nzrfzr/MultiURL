@@ -1,22 +1,55 @@
-=========================================================
-      CARA PASANG EKSTENSI MultiURL (DRAG & DROP)
-=========================================================
+==============================================================================
+                 PANDUAN INSTALASI EKSTENSI MultiURL (v1.0.0)
+==============================================================================
 
-Langkah cepat (hanya 10 detik):
+Tersedia dua pilihan cara pemasangan:
 
-1. Ekstrak file MultiURL-v1.0.0.rar ini ke folder mana saja.
-   (Misal di Desktop atau folder Downloads).
+------------------------------------------------------------------------------
+METODE 1: PASANG SEKALI KLIK DENGAN BATCH SCRIPT (Sangat Direkomendasikan)
+------------------------------------------------------------------------------
+1. Cukup klik ganda (double-click) file:
+   "Pasang_MultiURL.bat"
 
-2. Buka Google Chrome (atau Edge / Brave).
+2. Script akan secara otomatis:
+   - Menyiapkan folder ekstensi di penyimpanan aman Windows (AppData)
+     agar ekstensi tidak hilang jika folder unduhan dibersihkan.
+   - Menyalin path folder langsung ke Clipboard Windows Anda.
+   - Membuka halaman ekstensi browser Anda (Chrome / Edge / Brave).
+   - Membuka Windows Explorer ke folder ekstensi.
 
-3. Masuk ke halaman ekstensi:
-   Ketik: chrome://extensions di address bar, lalu tekan Enter.
+3. Di halaman browser:
+   - Pastikan "Developer mode" (Mode Pengembang) di kanan atas sudah AKTIF (ON).
+   - Tarik (drag & drop) folder "MultiURL" ke halaman browser,
+     ATAU klik tombol "Muat yang belum dibongkar" (Load unpacked) lalu tekan 
+     Ctrl + V dan klik "Pilih Folder".
 
-4. Aktifkan saklar "Developer mode" (Mode Pengembang)
-   di pojok kanan atas halaman.
+4. Selesai! Ekstensi langsung terpasang dan aktif.
 
-5. TARIK (DRAG & DROP) folder "MultiURL" langsung ke 
-   tengah-tengah halaman chrome://extensions tersebut.
 
-6. Selesai! MultiURL langsung terpasang dan muncul di icon puzzle Chrome.
-   (Tips: Klik ikon puzzle di toolbar Chrome lalu klik pin MultiURL agar selalu tampil).
+------------------------------------------------------------------------------
+METODE 2: INSTALASI MANUAL (DRAG & DROP)
+------------------------------------------------------------------------------
+1. Buka browser Google Chrome (atau Microsoft Edge / Brave).
+
+2. Buka halaman pengaturan ekstensi:
+   - Chrome : Ketik "chrome://extensions" di address bar lalu Enter.
+   - Edge   : Ketik "edge://extensions" di address bar lalu Enter.
+   - Brave  : Ketik "brave://extensions" di address bar lalu Enter.
+
+3. Aktifkan saklar "Developer mode" (Mode Pengembang) di pojok kanan atas.
+
+4. Tarik (Drag & Drop) folder "MultiURL" dari folder ini langsung ke tengah 
+   halaman ekstensi browser.
+   (Atau klik tombol "Muat yang belum dibongkar" di pojok kiri atas, 
+   lalu pilih folder "MultiURL").
+
+5. Selesai!
+
+
+------------------------------------------------------------------------------
+TIPS SETELAH PEMASANGAN:
+------------------------------------------------------------------------------
+- Klik ikon puzzle (Extensions) di toolbar kanan atas browser Anda.
+- Klik ikon "Pin" di sebelah MultiURL agar ikon MultiURL selalu muncul 
+  dan mudah diakses kapan saja.
+==============================================================================
