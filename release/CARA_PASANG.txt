@@ -2,10 +2,30 @@
                  PANDUAN INSTALASI EKSTENSI MultiURL (v1.0.0)
 ==============================================================================
 
-Tersedia dua pilihan cara pemasangan:
+Tersedia tiga pilihan cara pemasangan:
 
 ------------------------------------------------------------------------------
-METODE 1: PASANG SEKALI KLIK DENGAN BATCH SCRIPT (Sangat Direkomendasikan)
+METODE 1: INSTALASI VIA FILE .CRX (Paling Mudah)
+------------------------------------------------------------------------------
+1. Buka browser Google Chrome (atau Microsoft Edge / Brave).
+
+2. Buka halaman pengaturan ekstensi:
+   - Chrome : Ketik "chrome://extensions" di address bar lalu Enter.
+   - Edge   : Ketik "edge://extensions" di address bar lalu Enter.
+   - Brave  : Ketik "brave://extensions" di address bar lalu Enter.
+
+3. Aktifkan saklar "Developer mode" (Mode Pengembang) di pojok kanan atas.
+
+4. Tarik (Drag & Drop) file "MultiURL-v1.0.0.crx" dari folder ini langsung
+   ke tengah halaman ekstensi browser.
+
+5. Klik tombol "Add extension" / "Tambahkan ekstensi" pada dialog konfirmasi.
+
+6. Selesai! Ekstensi langsung terpasang dan aktif.
+
+
+------------------------------------------------------------------------------
+METODE 2: PASANG SEKALI KLIK DENGAN BATCH SCRIPT (Direkomendasikan)
 ------------------------------------------------------------------------------
 1. Cukup klik ganda (double-click) file:
    "Pasang_MultiURL.bat"
@@ -27,7 +47,7 @@ METODE 1: PASANG SEKALI KLIK DENGAN BATCH SCRIPT (Sangat Direkomendasikan)
 
 
 ------------------------------------------------------------------------------
-METODE 2: INSTALASI MANUAL (DRAG & DROP)
+METODE 3: INSTALASI MANUAL (DRAG & DROP FOLDER)
 ------------------------------------------------------------------------------
 1. Buka browser Google Chrome (atau Microsoft Edge / Brave).
 
